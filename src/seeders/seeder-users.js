@@ -10,9 +10,7 @@ module.exports = {
                 lastName: 'Dang',
                 address: 'tphcm',
                 gender: 1,
-                typeRole: 'ROLE',
-                keyRole: 'R1',
-
+                positionId: 1, // Thay thế typeRole và keyRole bằng positionId
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },

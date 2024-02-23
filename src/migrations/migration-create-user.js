@@ -35,6 +35,7 @@ module.exports = {
                 type: Sequelize.STRING,
             },
             positionId: {
+                // Changed column name from positionId to position
                 type: Sequelize.STRING,
             },
             image: {
