@@ -4,9 +4,11 @@ import viewEngine from './config/viewEngine';
 import initWebRoutes from './route/web';
 import dotenv from 'dotenv';
 import connectDb from './config/connectDb';
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
+app.use(cors({ origin: true }));
 
 // Cấu hình app để sử dụng bodyParser
 app.use(bodyParser.json());
@@ -15,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 viewEngine(app);
 
 initWebRoutes(app);
- connectDb();
+connectDb();
 
 // Lấy cổng từ biến môi trường hoặc mặc định là 3000
 const port = process.env.PORT || 3001;
