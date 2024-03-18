@@ -1,4 +1,8 @@
 import db from '../models/index';
+require('dotenv').config();
+import _ from 'lodash';
+import schedule from '../models/schedule';
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHome = (limitInput) => {
     return new Promise(async (resolve, reject) => {
@@ -50,18 +54,33 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameters',
                 });
             } else {
-                await db.Markdown.create({
-                    contentHTML: inputData.contentHTML,
-                    contentMarkdown: inputData.contentMarkdown,
-                    description: inputData.description,
-                    doctorId: inputData.doctorId,
-                });
+                if (inputData.action === 'CREATE') {
+                    await db.Markdown.create({
+                        contentHTML: inputData.contentHTML,
+                        contentMarkdown: inputData.contentMarkdown,
+                        description: inputData.description,
+                        doctorId: inputData.doctorId,
+                    });
+                } else if (inputData.action === 'EDIT') {
+                    let doctorMarkdown = await db.Markdown.findOne({
+                        where: { doctorId: inputData.doctorId },
+                        raw: false,
+                    });
+
+                    if (doctorMarkdown) {
+                        doctorMarkdown.contentHTML = inputData.contentHTML;
+                        doctorMarkdown.contentMarkdown = inputData.contentMarkdown;
+                        doctorMarkdown.description = inputData.description;
+                        await doctorMarkdown.save();
+                    }
+                }
+
                 resolve({
                     errCode: 0,
                     errMessage: 'Save infor doctor success',
@@ -116,10 +135,62 @@ let getDetailDoctorById = (inputId) => {
     });
 };
 
+let bulkCreateSchedule = async (data) => {
+    try {
+        if (!data.arrSchedule || !data.doctorId || !data.formatedDate) {
+            return {
+                errCode: 1,
+                errMessage: 'Missing required parameters !',
+            };
+        } else {
+            let schedule = data.arrSchedule;
+            if (schedule && schedule.length > 0) {
+                schedule = schedule.map((item) => {
+                    item.maxNumber = MAX_NUMBER_SCHEDULE;
+                    return item;
+                });
+            }
+
+            let existing = await db.Schedule.findAll({
+                where: { doctorId: data.doctorId, date: data.formatedDate },
+                attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
+                raw: true,
+            });
+            if (existing && existing.length > 0) {
+                existing = existing.map((item) => {
+                    item.date = new Date(item.date).getTime();
+                    return item;
+                });
+            }
+            let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                return a.timeType === b.timeType && a.date === b.date;
+            });
+
+            if (toCreate && toCreate.length > 0) {
+                await db.Schedule.bulkCreate(toCreate);
+            }
+
+            console.log('check different =========================================2', toCreate);
+
+            return {
+                errCode: 0,
+                errMessage: 'OK',
+            };
+        }
+    } catch (e) {
+        console.log(e);
+        return {
+            errCode: -1,
+            errMessage: 'Error from server',
+        };
+    }
+};
+
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors,
     getAllDoctors,
     saveDetailInforDoctor,
     getDetailDoctorById,
+    bulkCreateSchedule,
 };
