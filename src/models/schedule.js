@@ -16,14 +16,14 @@ module.exports = (sequelize, DataTypes) => {
             // id: DataTypes.INTEGER,
             currentNumber: DataTypes.INTEGER,
             maxNumber: DataTypes.INTEGER,
-            date: DataTypes.DATE,
+            date: DataTypes.STRING,
             timeType: DataTypes.STRING,
             doctorId: DataTypes.INTEGER,
         },
         {
             sequelize,
             modelName: 'Schedule',
-            tableName: 'schedule', // Tên bảng là "schedule"
+            tableName: 'schedule',
         },
     );
     return Schedule;
