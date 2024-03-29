@@ -33,6 +33,9 @@ let postBookAppointment = (data) => {
                     defaults: {
                         email: data.email,
                         roleId: 'R3',
+                        gender: data.selectedGender,
+                        address: data.address,
+                        firstName: data.fullName,
                     },
                 });
 
@@ -52,6 +55,7 @@ let postBookAppointment = (data) => {
                         },
                     });
                     console.log('data', data);
+                    console.log('User:', user);
                 }
                 resolve({
                     // data: user,

@@ -399,6 +399,11 @@ let getListPatientFormDoctor = (doctorId, date) => {
                             attributes: ['email', 'firstName', 'address', 'gender'],
                             include: [{ model: db.Allcode, as: 'genderData', attributes: ['valueEn', 'ValueVi'] }],
                         },
+                        {
+                            model: db.Allcode,
+                            as: 'timeTypeDataPatient',
+                            attributes: ['valueEn', 'ValueVi'],
+                        },
                     ],
                     raw: false,
                     nest: true,
@@ -407,6 +412,7 @@ let getListPatientFormDoctor = (doctorId, date) => {
                     errCode: 0,
                     data: data,
                 });
+                console.log('check data', data);
             }
         } catch (e) {
             reject(e);

@@ -23,7 +23,7 @@ let handleUserLogin = (email, password) => {
             let isExist = await checkUserEmail(email);
             if (isExist) {
                 let user = await db.User.findOne({
-                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'], // Loại bỏ trường password
+                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName'], // Loại bỏ trường password
                     where: { email: email },
                 });
 
