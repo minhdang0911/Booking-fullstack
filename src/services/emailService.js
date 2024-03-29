@@ -58,6 +58,62 @@ let getBodyHTMLEmail = (dataSend) => {
     return result;
 };
 
+let getBodyHTMLEmailRemedy = (dataSend) => {
+    let result = '';
+    let signature = '<p style="margin-top: 20px;">Best regards,</p><p>Booking Care Team</p>';
+
+    if (dataSend.language === 'vi') {
+        result = `
+            <h3>Xin chào ${dataSend.patientName}!</h3>
+            <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên Booking Care thành công.</p>
+            <p>Thông tin đơn thuốc/hóa đơn được gửi trong file đính kèm</p>
+           
+            <p>Xin chân thành cảm ơn</p>
+           
+        `;
+    }
+
+    if (dataSend.language === 'en') {
+        result = `
+            <h3>Dear ${dataSend.patientName}!</h3>
+            <p>You have received this email because you booked an online medical appointment on Booking Care.</p>
+            <p>Information for scheduling medical examination:</p>
+            <p>Thank</p>
+        `;
+    }
+
+    return result;
+};
+
+let sendattachment = async (dataSend) => {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL_APP,
+            pass: process.env.EMAIL_APP_PASSWORD,
+        },
+    });
+
+    const info = await transporter.sendMail({
+        from: '"Minh Dang 👻" <minhdang9a8@gmail.com>',
+        to: dataSend.email,
+        subject: 'Kết quả đặt lịch khám bệnh',
+        // text: 'Hello world?',
+        html: getBodyHTMLEmailRemedy(dataSend),
+        attachments: [
+            {
+                filename: `remedy-${dataSend.patientId}-${new Date().getTime}.png`,
+
+                content: dataSend.imageBase64.split('base64,')[1],
+                encoding: 'base64',
+            },
+        ],
+    });
+};
+
 module.exports = {
     sendSimpleEmail: sendSimpleEmail,
+    sendattachment: sendattachment,
 };

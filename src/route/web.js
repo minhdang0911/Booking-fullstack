@@ -41,6 +41,8 @@ let initWebRoutes = (app) => {
     router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
 
     router.get('/api/get-list-patient-for-doctor', doctorController.getListPatientFormDoctor);
+
+    router.post('/api/send-remedy', doctorController.sendRemedy);
     router.get('/test', (req, res) => {
         return res.send('hello word test');
     });
